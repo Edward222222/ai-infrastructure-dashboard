@@ -26,6 +26,11 @@ export default function Dashboard() {
               A data solution to optimise GPU utilisation and energy efficiency across a global AI infrastructure fleet
             </p>
           </div>
+          <div className="text-[9px] text-slate-400 text-right">
+            <p className="font-medium text-slate-600">Current as of</p>
+            <p>29 April 2026, 23:59</p>
+            <p className="mt-1 text-slate-400">IOT552U</p>
+          </div>
         </div>
       </header>
 

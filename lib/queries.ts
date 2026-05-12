@@ -12,13 +12,21 @@ export const QUERIES: Record<string, QueryDef> = {
   // KPI summary
   // -------------------------------------------------------------------------
   summary_metrics: {
-    description: "Top-level KPIs for the dashboard header.",
+    description: "Top-level KPIs for the dashboard header. Job and energy figures are relative to a fixed reference timestamp at the end of the simulation window.",
     sql: `
+      WITH ref AS (
+        SELECT '2026-04-29 23:59:59' AS now_ts,
+               datetime('2026-04-29 23:59:59', '-1 day') AS day_ago
+      )
       SELECT
         (SELECT COUNT(*) FROM DataCentre)                              AS total_datacentres,
         (SELECT COUNT(*) FROM GPU)                                     AS total_gpus,
-        (SELECT COUNT(*) FROM WorkloadJob)                             AS total_jobs,
-        (SELECT ROUND(SUM(kwh_consumed), 0) FROM EnergyRecord)         AS total_kwh,
+        (SELECT COUNT(*) FROM WorkloadJob
+           WHERE start_time >= (SELECT day_ago FROM ref)
+             AND start_time <= (SELECT now_ts FROM ref))               AS jobs_last_24h,
+        (SELECT ROUND(COALESCE(SUM(kwh_consumed), 0), 0) FROM EnergyRecord
+           WHERE timestamp >= (SELECT day_ago FROM ref)
+             AND timestamp <= (SELECT now_ts FROM ref))                AS kwh_last_24h,
         (SELECT ROUND(AVG(utilisation_pct), 1) FROM UtilisationRecord) AS avg_utilisation_pct,
         (SELECT ROUND(AVG(pue_rating), 2) FROM DataCentre)             AS avg_pue
     `,

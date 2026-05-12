@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 type Metrics = {
   total_datacentres: number;
   total_gpus: number;
-  total_jobs: number;
-  total_kwh: number;
+  jobs_last_24h: number;
+  kwh_last_24h: number;
   avg_utilisation_pct: number;
   avg_pue: number;
 };
  
-function formatNumber(n: number): string {
+function formatNumber(n: number | null | undefined): string {
+  if (n == null) return "—";
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
   if (n >= 1_000)     return (n / 1_000).toFixed(1) + "k";
   return n.toLocaleString();
@@ -20,8 +21,8 @@ function formatNumber(n: number): string {
 const KPIS: Array<{ key: keyof Metrics; label: string; format?: (n: number) => string }> = [
   { key: "total_datacentres",    label: "Data Centres" },
   { key: "total_gpus",           label: "GPUs",            format: formatNumber },
-  { key: "total_jobs",           label: "Jobs",            format: formatNumber },
-  { key: "total_kwh",            label: "Total kWh",       format: formatNumber },
+  { key: "jobs_last_24h",        label: "Jobs (24h)",      format: formatNumber },
+  { key: "kwh_last_24h",         label: "kWh (24h)",       format: formatNumber },
   { key: "avg_utilisation_pct",  label: "Avg Utilisation", format: (n) => `${n}%` },
   { key: "avg_pue",              label: "Avg PUE" },
 ];
